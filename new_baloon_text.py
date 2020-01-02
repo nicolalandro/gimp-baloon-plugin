@@ -11,10 +11,11 @@ import math
 # layer=img.active_layer 
 
 def _translate_layer_at_seclection_center(layer, x1,y1,x2,y2):
+	pdb.gimp_text_layer_set_justification(layer, TEXT_JUSTIFY_CENTER)
+
 	cx = (x1 + x2)/2
 	cy = (y1 + y2)/2
 	pdb.gimp_item_transform_translate(layer, cx, cy)
-
 
 
 def python_new_baloon_text(img, layer, text, font, font_size):
