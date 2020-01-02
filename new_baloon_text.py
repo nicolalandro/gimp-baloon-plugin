@@ -17,7 +17,7 @@ def _translate_layer_at_seclection_center(layer, x1,y1,x2,y2):
 
 
 
-def python_new_baloon_text(img, layer):
+def python_new_baloon_text(img, layer, text, font):
     non_empty,x1,y1,x2,y2 = pdb.gimp_selection_bounds(img)
     if not non_empty:
 		pdb.gimp_message("Must have an active selection")
@@ -27,7 +27,7 @@ def python_new_baloon_text(img, layer):
 		pdb.gimp_image_insert_layer(img, box, None, -1)
 		pdb.gimp_edit_fill(box, 1)
 		# create text
-		text_layer = pdb.gimp_text_layer_new(img, 'Text', 1, 0.1, 1)
+		text_layer = pdb.gimp_text_layer_new(img, text, font, 0.1, 1)
 		pdb.gimp_image_insert_layer(img, text_layer, None, -1)
 		_translate_layer_at_seclection_center(text_layer,x1,y1,x2,y2)
 
@@ -41,7 +41,10 @@ register(
 		"2020",
 		"<Image>/Select/Add Baloon...",
 		"*",
-		[],
+		[
+			(PF_TEXT, "text", "Baloon text:", 'Text'),
+			(PF_FONT, "font", "Baloon font:", 0),
+		],
 		[],
 		python_new_baloon_text)
 		
