@@ -51,11 +51,19 @@ class AddBalloon(Gimp.PlugIn):
 
     def run(self, procedure, run_mode, image, n_drawables, drawables, args, run_data):
         if n_drawables != 1:
-            msg = _("Procedure '{}' only works with one drawable.").format(procedure.get_name())
+            msg = _(f"Procedure '{procedure.get_name()}' only works with one drawable.")
             error = GLib.Error.new_literal(Gimp.PlugIn.error_quark(), msg, 0)
             return procedure.new_return_values(Gimp.PDBStatusType.CALLING_ERROR, error)
         else:
             drawable = drawables[0]
+
+        # check if selection exist
+        selection = image.get_selection()
+        flag, non_empty, x1, y1, x2, y2 = selection.bounds(image)
+        if not non_empty:
+            msg = _(f"The selection is empty, create a selection box and precede with the use of this plugin.")
+            error = GLib.Error.new_literal(Gimp.PlugIn.error_quark(), msg, 0)
+            return procedure.new_return_values(Gimp.PDBStatusType.CALLING_ERROR, error)
 
         if run_mode == Gimp.RunMode.INTERACTIVE:
             gi.require_version('Gtk', '3.0')
