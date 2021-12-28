@@ -23,12 +23,12 @@ gettext.textdomain(textdomain)
 _ = gettext.gettext
 def N_(message): return message
 
-class AddBaloon(Gimp.PlugIn):
+class AddBalloon(Gimp.PlugIn):
     def do_query_procedures(self):
         self.set_translation_domain(textdomain,
                                     Gio.file_new_for_path(Gimp.locale_directory()))
 
-        return [ "plug-in-add-baloon" ]
+        return [ "plug-in-add-balloon" ]
 
     def do_create_procedure(self, name):
         procedure = Gimp.ImageProcedure.new(self, name,
@@ -38,11 +38,11 @@ class AddBaloon(Gimp.PlugIn):
         procedure.set_image_types("*")
         procedure.set_sensitivity_mask (Gimp.ProcedureSensitivityMask.DRAWABLE)
 
-        procedure.set_menu_label(N_("Add Baloon..."))
+        procedure.set_menu_label(N_("Add Balloon..."))
         procedure.set_icon_name(GimpUi.ICON_GEGL)
         procedure.add_menu_path('<Image>/Select')
 
-        procedure.set_documentation(N_("Add a text for baloon"),
+        procedure.set_documentation(N_("Add a text for balloon"),
                                     N_("Add text and a layer with white inside the selection"),
                                     name)
         procedure.set_attribution("Z-UO", "Z-UO", "2022")
@@ -63,11 +63,11 @@ class AddBaloon(Gimp.PlugIn):
             gi.require_version('Gdk', '3.0')
             from gi.repository import Gdk
 
-            GimpUi.init("add_baloon.py")
+            GimpUi.init("add_balloon.py")
 
             dialog = GimpUi.Dialog(use_header_bar=True,
-                                   title=_("Add Baloon)"),
-                                   role="add_baloon-Python3")
+                                   title=_("Add Balloon)"),
+                                   role="add_balloon-Python3")
             dialog.add_button(_("_Cancel"), Gtk.ResponseType.CANCEL)
             dialog.add_button(_("_OK"), Gtk.ResponseType.OK)
 
@@ -110,23 +110,29 @@ class AddBaloon(Gimp.PlugIn):
                 if response == Gtk.ResponseType.OK:
                     # TODO enable spinner and lock all other values
 
-                    # ERROR add new trasparent layer
+                    # add new trasparent layer
                     overlay_layer = Gimp.Layer.new(
                         image, 'hide_background',
                         drawable.get_width(), drawable.get_height(),
-                        Gimp.ImageType, 100.0,
+                        Gimp.ImageType.RGBA_IMAGE, 100.0,
                         Gimp.LayerMode.NORMAL
                     )
+                    result = Gimp.get_pdb().run_procedure('gimp-image-get-item-position',
+                                 [image,
+                                  drawable])
+
+                    position = result.index(1)
+                    image.insert_layer(overlay_layer,None,position)
                     overlay_layer.fill(Gimp.FillType.TRANSPARENT)
 
-                    # TODO add white fill following the selection
+                    # TODO add white fill the selection
 
                     # TODO add text layer
 
                     # TODO put the overlay_layer and the text_layer into a group
 
                     dialog.destroy()
-                    continue
+                    break
                 else:
                     dialog.destroy()
                     return procedure.new_return_values(Gimp.PDBStatusType.CANCEL,
@@ -134,4 +140,4 @@ class AddBaloon(Gimp.PlugIn):
 
         return procedure.new_return_values(Gimp.PDBStatusType.SUCCESS, GLib.Error())
 
-Gimp.main(AddBaloon.__gtype__, sys.argv)
+Gimp.main(AddBalloon.__gtype__, sys.argv)
