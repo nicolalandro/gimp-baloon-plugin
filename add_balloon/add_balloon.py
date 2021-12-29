@@ -164,6 +164,12 @@ class AddBalloon(Gimp.PlugIn):
                     Gimp.get_pdb().run_procedure('gimp-item-transform-translate',
                                  [text_layer, cx, cy])
 
+                    # set selected layer
+                    garray = Gimp.ObjectArray()
+                    garray.data.__add__([layer_group])
+                    Gimp.get_pdb().run_procedure('gimp-image-set-selected-layers',
+                                 [image, 1, garray ])
+
 
                     dialog.destroy()
                     break
