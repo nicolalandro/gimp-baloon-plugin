@@ -107,13 +107,10 @@ class AddBalloon(Gimp.PlugIn):
             scrolled.add(text_content)
             text_content.show()
 
+            # Improve UI
             font_chooser = Gtk.FontChooserWidget()
             box.pack_start(font_chooser, False, False, 1)
             font_chooser.show()
-
-            # TODO select font
-
-            # TODO select font-size
 
             # TODO add spinner for waiting
 
@@ -153,18 +150,17 @@ class AddBalloon(Gimp.PlugIn):
                     font_str = font_chooser.get_font()
                     font_size = float(font_str.split(' ')[-1])
                     font_name = ' '.join(font_str.split(' ')[0:-2])
-                    print(font_size)
-                    print(font_name)
+
                     text_layer = Gimp.get_pdb().run_procedure('gimp-text-layer-new',
-                                 [image, text, font_name, font_size, 2
+                                 [image, text, font_name, font_size, 3
                                   ]).index(1)
                     image.insert_layer(text_layer,layer_group,position - 1)
 
-                    # center text layer, TODO subtract the size of text layer to perfect centering
+                    # center text layer
                     Gimp.get_pdb().run_procedure('gimp-text-layer-set-justification',
                                  [text_layer, 2])
-                    cx = (x1 + x2)/2
-                    cy = (y1 + y2)/2
+                    cx = (x1 + x2)/2 - text_layer.get_width()/2
+                    cy = (y1 + y2)/2 - text_layer.get_height()/2
                     Gimp.get_pdb().run_procedure('gimp-item-transform-translate',
                                  [text_layer, cx, cy])
 
