@@ -107,6 +107,10 @@ class AddBalloon(Gimp.PlugIn):
             scrolled.add(text_content)
             text_content.show()
 
+            font_chooser = Gtk.FontChooserWidget()
+            box.pack_start(font_chooser, False, False, 1)
+            font_chooser.show()
+
             # TODO select font
 
             # TODO select font-size
@@ -142,11 +146,17 @@ class AddBalloon(Gimp.PlugIn):
                                  [overlay_layer,
                                   Gimp.FillType.WHITE])
 
-                    # add text layer, TODO use text, font and size from UI
+                    # add text layer
                     buffer = text_content.get_buffer()
                     text = buffer.get_text(buffer.get_start_iter(), buffer.get_end_iter(), True)
+
+                    font_str = font_chooser.get_font()
+                    font_size = float(font_str.split(' ')[-1])
+                    font_name = ' '.join(font_str.split(' ')[0:-2])
+                    print(font_size)
+                    print(font_name)
                     text_layer = Gimp.get_pdb().run_procedure('gimp-text-layer-new',
-                                 [image, text, "stxscr", 24.0, 0
+                                 [image, text, font_name, font_size, 2
                                   ]).index(1)
                     image.insert_layer(text_layer,layer_group,position - 1)
 
