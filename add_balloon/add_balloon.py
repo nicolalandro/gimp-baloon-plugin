@@ -18,7 +18,7 @@ import sys
 
 textdomain = 'gimp30-std-plug-ins'
 gettext.bindtextdomain(textdomain, Gimp.locale_directory())
-gettext.bind_textdomain_codeset(textdomain, 'UTF-8')
+# gettext.bind_textdomain_codeset(textdomain, 'UTF-8')
 gettext.textdomain(textdomain)
 _ = gettext.gettext
 def N_(message): return message
@@ -118,6 +118,15 @@ class AddBalloon(Gimp.PlugIn):
                 if response == Gtk.ResponseType.OK:
                     # TODO enable spinner and lock all other values
 
+                    # layer position
+                    position = Gimp.get_pdb().run_procedure('gimp-image-get-item-position',
+                                 [image,
+                                  drawable]).index(1)
+                    # Create group
+                    layer_group = Gimp.get_pdb().run_procedure('gimp-layer-group-new',
+                                 [image]).index(1)
+                    image.insert_layer(layer_group,None,position)
+
                     # add new trasparent layer
                     overlay_layer = Gimp.Layer.new(
                         image, 'hide_background',
@@ -125,19 +134,30 @@ class AddBalloon(Gimp.PlugIn):
                         Gimp.ImageType.RGBA_IMAGE, 100.0,
                         Gimp.LayerMode.NORMAL
                     )
-                    result = Gimp.get_pdb().run_procedure('gimp-image-get-item-position',
-                                 [image,
-                                  drawable])
-
-                    position = result.index(1)
-                    image.insert_layer(overlay_layer,None,position)
+                    image.insert_layer(overlay_layer,layer_group,position)
                     overlay_layer.fill(Gimp.FillType.TRANSPARENT)
 
-                    # TODO add white fill the selection
+                    # add white fill the selection
+                    Gimp.get_pdb().run_procedure('gimp-drawable-edit-fill',
+                                 [overlay_layer,
+                                  Gimp.FillType.WHITE])
 
-                    # TODO add text layer
+                    # add text layer, TODO use text, font and size from UI
+                    buffer = text_content.get_buffer()
+                    text = buffer.get_text(buffer.get_start_iter(), buffer.get_end_iter(), True)
+                    text_layer = Gimp.get_pdb().run_procedure('gimp-text-layer-new',
+                                 [image, text, "stxscr", 24.0, 0
+                                  ]).index(1)
+                    image.insert_layer(text_layer,layer_group,position - 1)
 
-                    # TODO put the overlay_layer and the text_layer into a group
+                    # center text layer, TODO subtract the size of text layer to perfect centering
+                    Gimp.get_pdb().run_procedure('gimp-text-layer-set-justification',
+                                 [text_layer, 2])
+                    cx = (x1 + x2)/2
+                    cy = (y1 + y2)/2
+                    Gimp.get_pdb().run_procedure('gimp-item-transform-translate',
+                                 [text_layer, cx, cy])
+
 
                     dialog.destroy()
                     break
