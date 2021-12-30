@@ -165,10 +165,7 @@ class AddBalloon(Gimp.PlugIn):
                                  [text_layer, cx, cy])
 
                     # set selected layer
-                    garray = Gimp.ObjectArray()
-                    garray.data.__add__([layer_group])
-                    Gimp.get_pdb().run_procedure('gimp-image-set-selected-layers',
-                                 [image, 1, garray ])
+                    image.set_selected_layers([layer_group])
 
 
                     dialog.destroy()
