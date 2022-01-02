@@ -72,52 +72,32 @@ class AddBalloon(Gimp.PlugIn):
             from gi.repository import Gdk
 
             GimpUi.init("add_balloon.py")
-
             dialog = GimpUi.Dialog(use_header_bar=True,
-                                   title=_("Add Balloon)"),
-                                   role="add_balloon-Python3")
+                                   title=_("Add Balloon"),
+                                   role="add-balloon-Python3")
             dialog.add_button(_("_Cancel"), Gtk.ResponseType.CANCEL)
             dialog.add_button(_("_OK"), Gtk.ResponseType.OK)
 
-            geometry = Gdk.Geometry()
-            geometry.min_aspect = 0.5
-            geometry.max_aspect = 1.0
-            dialog.set_geometry_hints(None, geometry, Gdk.WindowHints.ASPECT)
+            builder = Gtk.Builder()
+            dir_path = os.path.dirname(os.path.realpath(__file__))
+            builder.add_from_file(os.path.join(dir_path, "ui_nodialog.glade"))
 
-            box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=2)
+            box = builder.get_object("box")
             dialog.get_content_area().add(box)
             box.show()
 
-            # Label text content
-            label = Gtk.Label(label='Text:')
-            box.pack_start(label, False, False, 1)
-            label.show()
+            dialog.get_content_area().set_hexpand_set(True)
+            box.set_hexpand_set(True)
+            dialog.get_content_area().set_vexpand_set(True)
+            box.set_vexpand_set(True)
 
-            # scroll area for text
-            scrolled = Gtk.ScrolledWindow()
-            scrolled.set_vexpand (True)
-            box.pack_start(scrolled, True, True, 1)
-            scrolled.show()
+            text_buffer = builder.get_object("textbuffer")
+            font_chooser = builder.get_object("font")
 
-            # text content box
-            text_content = Gtk.TextView()
-            contents = 'text'
-            buffer = text_content.get_buffer()
-            buffer.set_text(contents, -1)
-            scrolled.add(text_content)
-            text_content.show()
-
-            # Improve UI
-            font_chooser = Gtk.FontChooserWidget()
-            box.pack_start(font_chooser, False, False, 1)
-            font_chooser.show()
-
-            # TODO add spinner for waiting
 
             while (True):
                 response = dialog.run()
                 if response == Gtk.ResponseType.OK:
-                    # TODO enable spinner and lock all other values
 
                     # layer position
                     position = Gimp.get_pdb().run_procedure('gimp-image-get-item-position',
@@ -144,8 +124,7 @@ class AddBalloon(Gimp.PlugIn):
                                   Gimp.FillType.WHITE])
 
                     # add text layer
-                    buffer = text_content.get_buffer()
-                    text = buffer.get_text(buffer.get_start_iter(), buffer.get_end_iter(), True)
+                    text = text_buffer.get_text(text_buffer.get_start_iter(), text_buffer.get_end_iter(), True)
 
                     font_str = font_chooser.get_font()
                     font_size = float(font_str.split(' ')[-1])
