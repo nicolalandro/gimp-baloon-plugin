@@ -66,3 +66,11 @@ chmod +x new_baloon_text.py
 * here the results
 ![result](imgs/python2/demo4.png)
 
+## Development references
+Here I put some reference to study how to develop a plugin like this
+* GTK: UI framework
+  * [Glade](https://glade.gnome.org/): UI tool to create .glade xml ui
+GIMP python plugin:
+  * [Gimp Doc Python2](https://www.gimp.org/docs/python/index.html): Old gimp documentation obout python2 (it is used for the first version of the plugin)
+  * [Create Python3 Plugin for GIMP: The basics](https://z-uo.medium.com/create-python3-plugin-for-gimp-the-basics-94ede94e9d1f): how to develop python3 plugin (GIMP 2.99.*)
+  * [Forum - Develop Python3 plugin for GIMP](https://www.gimp-forum.net/Thread-Learn-to-create-Python3-plugins): discussion thread
